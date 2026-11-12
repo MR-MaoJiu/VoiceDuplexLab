@@ -7,7 +7,7 @@ runs/
 models/
 data/prepared/
 data/recordings/
-voices/*.wav
+voices/
 
 .cocoindex_code/
 .idea/
@@ -23,3 +23,4 @@ local/
 .playwright-cli/
 build/
 dist/
+configs/local.yaml
