@@ -2,7 +2,7 @@
 
 中文原生端到端语音对话研究项目。主语音模型采用 **MiniCPM-o-4.5**，任务后台采用 **Qwen3-8B**。支持网页麦克风对话、字幕、双向录音、参考音色管理，以及联合训练与断点恢复。
 
-当前版本为 **v8 / winik / 第1500步联合训练候选**，更新于2026年11月12日。当前仓库提供训练、推理、网页和资源管理源码。实验权重、优化器状态与训练素材保存在独立本地归档中，运行该候选需要另行恢复这些资源。
+当前版本为 **v8 / winik / 第1500步联合训练候选**，更新于2026年11月12日。当前仓库提供训练、推理、网页和资源管理源码。第1500步联合检查点、必需的语言初始化权重和推理配置通过 GitHub Release 下载。基座模型和后台模型从各自上游下载，原实验训练素材另行准备。
 
 ## 当前验证状态
 
@@ -80,12 +80,46 @@ bash quickstart.sh setup-asr
 
 [MiniCPM-o-4.5 模型卡](https://huggingface.co/openbmb/MiniCPM-o-4_5) · [Qwen3-8B 模型卡](https://huggingface.co/Qwen/Qwen3-8B)
 
-## 启动网页
+## 下载第1500步训练权重
 
-默认配置 `configs/default.yaml` 可加载原始基座。先复制一份实验配置，再按实际服务器资源路径调整。
+[打开 v8-step1500 模型发布页](https://github.com/MR-MaoJiu/VoiceDuplexLab/releases/tag/v8-step1500)
+
+压缩包约101MiB，包含以下内容。
+
+- `weights/language-v5/` 为联合权重依赖的语言初始化。
+- `weights/native-step1500/` 为语言、语音 token、投影层和 Flow 联合检查点，附带优化器及随机状态。
+- `configs/release-v8.yaml` 为可直接使用的候选推理配置，基座按固定上游版本从 Hugging Face 缓存加载。
+- `weights/MANIFEST-v8.json` 为逐文件 SHA256 清单，`weights/licenses/` 保存素材来源与条款。
+
+在克隆并进入项目目录后执行，解压前核对 SHA256。
 
 ```bash
-cp configs/default.yaml configs/local.yaml
+curl -fL --retry 3 -o VoiceDuplexLab-v8-step1500.tar.gz \
+  https://github.com/MR-MaoJiu/VoiceDuplexLab/releases/download/v8-step1500/VoiceDuplexLab-v8-step1500.tar.gz
+curl -fL --retry 3 -o SHA256SUMS-v8.txt \
+  https://github.com/MR-MaoJiu/VoiceDuplexLab/releases/download/v8-step1500/SHA256SUMS-v8.txt
+sha256sum -c SHA256SUMS-v8.txt
+tar -xzf VoiceDuplexLab-v8-step1500.tar.gz
+```
+
+随后按照上节安装依赖、下载上游基座与字幕模型，在两个终端分别启动。
+
+```bash
+# 终端一
+VOICE_CONFIG=configs/release-v8.yaml bash quickstart.sh backend-transformers
+
+# 终端二
+VOICE_CONFIG=configs/release-v8.yaml bash quickstart.sh web
+```
+
+该 Release 标记为研究预发布。情绪、唱歌、语速及智能打断的验收状态见本页表格。精确断点续训还需要原实验的 prepared 输入与相同超参数。实验适配权重采用 CC BY-NC-SA 4.0，基座、数据和源码分别遵循其许可，随包保留上游署名和 GTSinger 附加条款。
+
+## 启动网页
+
+第1500步候选使用下载包中的 `configs/release-v8.yaml`。需要调整路径时可以复制为本机工作配置。`configs/default.yaml` 可用于原始基座实验。
+
+```bash
+cp configs/release-v8.yaml configs/local.yaml
 ```
 
 例如本地权重及联合候选的配置字段如下。运行原始基座时可省略两个适配器字段。加载联合候选时，`adapter` 必须对应训练时的语言初始化，`native_adapter` 指向完整联合检查点。
