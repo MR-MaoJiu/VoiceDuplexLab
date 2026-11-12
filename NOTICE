@@ -1,0 +1,12 @@
+VoiceDuplexLab
+
+本项目针对 OpenBMB MiniCPM-o 4.5 编写接口适配与训练流程。
+voice_lab/model.py 的隐藏状态到语音 token 生成流程参考 OpenBMB 模型代码。
+上游代码版权归 The OpenBMB Team 所有，采用 Apache License 2.0。
+上游版本 fb09628e98b1f55d8d5b863e0eccfcdd11bff499
+https://huggingface.co/openbmb/MiniCPM-o-4_5
+模型权重与第三方依赖遵循各自许可证。
+
+CPU转写资源来自csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17，固定版本2365baeacb507f821a0c8120fcee3d484dba7a07。随附原始模型卡和LICENSE，LICENSE指向FunASR授权说明，不重新标注为源码的Apache许可。Silero VAD来自k2-fsa/sherpa-onnx官方发布，来源和SHA256在资源清单保留。
+
+中文情绪与非语言发声实验使用SMIIP-NV数据，固定版本081cf86ac83fbc26253f1350dff6393d88c49a8e。原数据许可为CC BY-NC-SA 4.0。来源：https://huggingface.co/datasets/xunyi/SMIIP-NV ，作者项目页：https://axunyii.github.io/SMIIP-NV/ 。数据、模型与源码许可分别适用，发布时保留来源和相应许可说明。

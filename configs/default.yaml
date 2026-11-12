@@ -1,0 +1,45 @@
+model:
+  architecture: native_e2e
+  path: openbmb/MiniCPM-o-4_5
+  revision: fb09628e98b1f55d8d5b863e0eccfcdd11bff499
+  device: cuda:0
+  dtype: bfloat16
+  adapter: null
+  voice: null
+  max_speak_tokens: 40
+  context_high: 7000
+  context_low: 5000
+server:
+  host: 127.0.0.1
+  port: 8765
+  token: ""
+  max_pending_frames: 8
+  voice_store: data/user_voices
+  # 多用户模式填写用户名和对应令牌的环境变量名。
+  # users: {alice: ALICE_VOICE_TOKEN, bob: BOB_VOICE_TOKEN}
+  users: {}
+  # 每个槽位是独立模型副本，隔离流式音频和声码器缓存。
+  # 多 GPU 例如 [cuda:0, cuda:1]，每个槽位同时接待一个会话。
+  worker_devices: [cuda:0]
+backend:
+  base_url: http://127.0.0.1:8001/v1
+  model: Qwen/Qwen3-8B
+  revision: b968826d9c46dd6066d109eabc6255188de91218
+  api_key_env: BACKEND_API_KEY
+  timeout: 90
+  enable_thinking: true
+  max_tokens: 4096
+  max_rounds: 5
+  knowledge_dir: data/knowledge
+training:
+  mask_forced_tokens: true
+  prepared_dir: data/prepared
+  output_dir: runs/duplex-lora
+  rank: 16
+  alpha: 32
+  learning_rate: 0.00002
+  epochs: 2
+  gradient_accumulation: 8
+  max_tokens: 4096
+  save_every: 100
+  seed: 42

@@ -1,0 +1,12 @@
+# 将此文件的 server 字段合并进 default.yaml。
+# 两个用户使用同一基座及同一套适配器，各自上传和选择参考音色。
+server:
+  host: 127.0.0.1
+  port: 8765
+  token: ""
+  max_pending_frames: 8
+  voice_store: data/user_voices
+  users:
+    alice: ALICE_VOICE_TOKEN
+    bob: BOB_VOICE_TOKEN
+  worker_devices: [cuda:0]
