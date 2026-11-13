@@ -193,7 +193,7 @@ def test_lazy_training_saves_and_resumes_without_recompiling(tmp_path, monkeypat
     config["training"].update(
         prepared_dir=str(tmp_path / "features"), output_dir=str(tmp_path / "run"),
         backup_dir=str(tmp_path / "backup"), keep_checkpoints=1,
-        gradient_accumulation=1, epochs=1, save_every=1, rank=2, alpha=4,
+        gradient_accumulation=1, epochs=1, save_every=1, rank=2, alpha=4, min_free_gib=0,
     )
     monkeypatch.setattr(train, "load_config", lambda path: config)
     monkeypatch.setattr(train, "load_base", lambda *a, **k: SimpleNamespace(

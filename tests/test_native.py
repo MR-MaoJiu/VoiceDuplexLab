@@ -335,3 +335,24 @@ def test_native_compiler_masks_automatically_inserted_unit_end(monkeypatch):
     compiled = train_native.compile_record(model, config, record)
     assert 7 in compiled['labels']
     assert 9 not in compiled['labels']
+
+def test_native_flow_weights_are_applied_once_per_engine(monkeypatch, tmp_path):
+    import sys
+    from voice_lab.native_flow import load_flow_weights
+    first = tmp_path / 'first'
+    second = tmp_path / 'second'
+    (first / 'flow_lora').mkdir(parents=True)
+    (second / 'flow_lora').mkdir(parents=True)
+    merged = object()
+    calls = []
+    def load(model, path):
+        calls.append(path)
+        return SimpleNamespace(merge_and_unload=lambda: merged)
+    monkeypatch.setitem(sys.modules, 'peft', SimpleNamespace(PeftModel=SimpleNamespace(from_pretrained=load)))
+    flow = SimpleNamespace(decoder=SimpleNamespace(estimator=object()))
+    model = SimpleNamespace(tts=SimpleNamespace(audio_tokenizer=SimpleNamespace(flow=flow)))
+    load_flow_weights(model, {'model': {'native_adapter': str(first)}})
+    load_flow_weights(model, {'model': {'native_adapter': str(first)}})
+    assert len(calls) == 1 and flow.decoder.estimator is merged
+    with pytest.raises(ValueError, match='重新加载'):
+        load_flow_weights(model, {'model': {'native_adapter': str(second)}})

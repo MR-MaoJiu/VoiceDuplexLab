@@ -64,6 +64,13 @@ def load_flow_weights(model, config):
     path = config['model'].get('native_adapter')
     if path and (local_path(path) / 'flow_lora').is_dir():
         flow = model.tts.audio_tokenizer.flow
+        source = str((local_path(path) / 'flow_lora').resolve())
+        loaded = getattr(flow, '_voice_lab_native_adapter', None)
+        if loaded == source:
+            return
+        if loaded is not None:
+            raise ValueError('切换联合权重需要重新加载基座模型')
         flow.decoder.estimator = PeftModel.from_pretrained(
             flow.decoder.estimator, str(local_path(path) / 'flow_lora')
         ).merge_and_unload()
+        flow._voice_lab_native_adapter = source
